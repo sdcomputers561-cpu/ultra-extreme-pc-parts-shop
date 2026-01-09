@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>ULTRA EXTREME PC SHOP</title>
+<style>
+body{font-family:Arial;background:#0f172a;color:#e5e7eb;margin:0}
+header{padding:20px;text-align:center;background:#020617}
+.container{padding:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.card{background:#020617;padding:15px;border-radius:12px;box-shadow:0 0 20px #000}
+img{width:100%;height:180px;object-fit:contain;background:#000}
+button{padding:8px;background:#dc2626;border:none;color:#fff;width:100%;margin-top:5px;cursor:pointer}
+input,select{width:100%;padding:8px;margin:5px 0}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center}
+.modal-box{background:#020617;padding:20px;border-radius:12px;width:90%;max-width:500px}
+.close{float:right;cursor:pointer}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>ULTRA EXTREME PC PARTS SHOP</h1>
+<p>PC Builder • Compatibility • Checkout</p>
+</header>
+
+<div class="container">
+
+<input id="search" placeholder="Search parts..." onkeyup="render()">
+
+<select id="category" onchange="render()">
+<option value="All">All</option>
+<option>CPU</option><option>Motherboard</option>
+<option>GPU</option><option>RAM</option>
+</select>
+
+<div class="grid" id="products"></div>
+
+<h2>🧠 PC BUILD CONFIGURATOR</h2>
+<select id="cpu"></select>
+<select id="mb"></select>
+<p id="compat"></p>
+
+<h2>🛒 CART</h2>
+<ul id="cart"></ul>
+<b>Total: Rs <span id="total">0</span></b>
+
+<h2>📦 CHECKOUT</h2>
+<input placeholder="Name">
+<input placeholder="Address">
+<input placeholder="Phone">
+<button onclick="alert('Order placed (demo)')">Place Order</button>
+
+</div>
+
+<div class="modal" id="modal">
+<div class="modal-box">
+<span class="close" onclick="modal.style.display='none'">✖</span>
+<h2 id="mName"></h2>
+<img id="mImg">
+<p id="mPrice"></p>
+</div>
+</div>
+
+<script>
+const img=t=>"https://via.placeholder.com/400x300?text="+t;
+
+const products=[
+{id:1,name:"Intel i5 12400",cat:"CPU",socket:"LGA1700",price:45000,img:img("i5")},
+{id:2,name:"Ryzen 5 7600",cat:"CPU",socket:"AM5",price:65000,img:img("Ryzen")},
+{id:3,name:"B660 Motherboard",cat:"Motherboard",socket:"LGA1700",price:38000,img:img("B660")},
+{id:4,name:"B650 Motherboard",cat:"Motherboard",socket:"AM5",price:42000,img:img("B650")},
+{id:5,name:"RTX 4090",cat:"GPU",price:650000,img:img("RTX4090")},
+{id:6,name:"16GB DDR5 RAM",cat:"RAM",price:28000,img:img("DDR5")}
+];
+
+let cart=[],total=0;
+
+function render(){
+productsEl.innerHTML="";
+products.filter(p=>
+p.name.toLowerCase().includes(search.value.toLowerCase()) &&
+(category.value=="All"||p.cat==category.value)
+).forEach(p=>{
+productsEl.innerHTML+=`
+<div class="card">
+<img src="${p.img}" onclick="openModal('${p.name}','${p.img}',${p.price})">
+<h3>${p.name}</h3>
+<p>${p.cat} | Rs ${p.price}</p>
+<button onclick="addCart(${p.id})">Add Cart</button>
+</div>`;
+});
+}
+
+function addCart(id){
+const p=products.find(x=>x.id==id);
+cart.push(p); total+=p.price;
+cartEl.innerHTML+=`<li>${p.name}</li>`;
+totalEl.textContent=total;
+}
+
+function openModal(n,i,p){
+modal.style.display="flex";
+mName.textContent=n;
+mImg.src=i;
+mPrice.textContent="Rs "+p;
+}
+
+const productsEl=document.getElementById("products");
+const cartEl=document.getElementById("cart");
+const totalEl=document.getElementById("total");
+
+// PC BUILDER
+const cpuSel=document.getElementById("cpu");
+const mbSel=document.getElementById("mb");
+products.filter(p=>p.cat=="CPU").forEach(p=>cpuSel.innerHTML+=`<option value="${p.socket}">${p.name}</option>`);
+products.filter(p=>p.cat=="Motherboard").forEach(p=>mbSel.innerHTML+=`<option value="${p.socket}">${p.name}</option>`);
+
+cpuSel.onchange=mbSel.onchange=()=>{
+compat.textContent=(cpuSel.value==mbSel.value)?"✅ Compatible":"❌ Not Compatible";
+}
+
+render();
+</script>
+
+</body>
+</html>
